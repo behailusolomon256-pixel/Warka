@@ -30,6 +30,16 @@ jobs:
       - name: Generate Android project files
         run: flutter create --platforms=android --project-name=warka_news .
 
+      - name: Set Android compile SDK
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager --install "platforms;android-36"
+          if [ -f android/app/build.gradle.kts ]; then
+            sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' android/app/build.gradle.kts
+          elif [ -f android/app/build.gradle ]; then
+            sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 36/' android/app/build.gradle
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
