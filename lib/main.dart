@@ -194,9 +194,9 @@ class StoryPage extends StatelessWidget {
     Text(am ? story.amh : story.en, style: const TextStyle(fontSize: 28, height: 1.2, fontWeight: FontWeight.w900)),
     const Divider(height: 35),
     Text(am ? story.bodyAm : story.bodyEn, style: const TextStyle(fontSize: 16, height: 1.8)),
-    if (story.sample) Padding(padding: const EdgeInsets.only(top: 22), child: Text(t(am, 'This is sample content, not a current news report.', 'ይህ የሙከራ ይዘት ነው።'), style: const TextStyle(color: grey, fontSize: 12))),
+    if (story.sample) Padding(padding: const EdgeInsets.only(top: 22), child: Text(tr(am, 'This is sample content, not a current news report.', 'ይህ የሙከራ ይዘት ነው።'), style: const TextStyle(color: grey, fontSize: 12))),
     const SizedBox(height: 20),
-    OutlinedButton.icon(onPressed: () async { await Clipboard.setData(ClipboardData(text: (am ? story.amh : story.en) + '\n\n' + (am ? story.bodyAm : story.bodyEn))); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t(am, 'Copied.', 'ተቀድቷል።')))); }, icon: const Icon(Icons.copy), label: Text(t(am, 'Copy story', 'ዜናውን ቅዳ'))),
+    OutlinedButton.icon(onPressed: () async { await Clipboard.setData(ClipboardData(text: (am ? story.amh : story.en) + '\n\n' + (am ? story.bodyAm : story.bodyEn))); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr(am, 'Copied.', 'ተቀድቷል።')))); }, icon: const Icon(Icons.copy), label: Text(tr(am, 'Copy story', 'ዜናውን ቅዳ'))),
   ]));
 }
 
@@ -218,7 +218,7 @@ class _TipPageState extends State<TipPage> {
   Future<void> submit() async {
     final am = widget.am;
     if (!(form.currentState?.validate() ?? false)) return;
-    if (!connected) { notice(t(am, 'Newsroom submissions are not connected yet.', 'የዜና ክፍሉ ገና አልተገናኘም።')); return; }
+    if (!connected) { notice(tr(am, 'Newsroom submissions are not connected yet.', 'የዜና ክፍሉ ገና አልተገናኘም።')); return; }
     setState(() => sending = true);
     try {
       String? path;
@@ -231,27 +231,27 @@ class _TipPageState extends State<TipPage> {
       await Supabase.instance.client.from('news_tips').insert({'subject': subject.text.trim(), 'message': details.text.trim(), 'contact': anonymous ? null : contact.text.trim(), 'is_anonymous': anonymous, 'media_path': path});
       subject.clear(); details.clear(); contact.clear();
       if (mounted) setState(() => media = null);
-      notice(t(am, 'Your tip was sent to the newsroom.', 'መረጃዎ ተልኳል።'));
-    } catch (_) { notice(t(am, 'Could not send. Please try again later.', 'መላክ አልተቻለም። ቆይተው ይሞክሩ።')); }
+      notice(tr(am, 'Your tip was sent to the newsroom.', 'መረጃዎ ተልኳል።'));
+    } catch (_) { notice(tr(am, 'Could not send. Please try again later.', 'መላክ አልተቻለም። ቆይተው ይሞክሩ።')); }
     finally { if (mounted) setState(() => sending = false); }
   }
   @override
   Widget build(BuildContext context) => Form(key: form, child: ListView(padding: const EdgeInsets.all(20), children: [
     heading(widget.am, Icons.campaign_outlined, 'Send a news tip', 'የዜና መረጃ ይላኩ'),
     const SizedBox(height: 8),
-    Text(t(widget.am, 'Share what you know. The newsroom reviews submissions before publication.', 'የሚያውቁትን ያጋሩ። ዜና ክፍሉ ከማተሙ በፊት ይመረምረዋል።'), style: const TextStyle(color: grey)),
+    Text(tr(widget.am, 'Share what you know. The newsroom reviews submissions before publication.', 'የሚያውቁትን ያጋሩ። ዜና ክፍሉ ከማተሙ በፊት ይመረምረዋል።'), style: const TextStyle(color: grey)),
     const SizedBox(height: 20),
-    TextFormField(controller: subject, decoration: InputDecoration(labelText: t(widget.am, 'Subject', 'ርዕስ')), validator: (v) => v == null || v.trim().isEmpty ? t(widget.am, 'Enter a subject', 'ርዕስ ያስገቡ') : null),
+    TextFormField(controller: subject, decoration: InputDecoration(labelText: tr(widget.am, 'Subject', 'ርዕስ')), validator: (v) => v == null || v.trim().isEmpty ? tr(widget.am, 'Enter a subject', 'ርዕስ ያስገቡ') : null),
     const SizedBox(height: 12),
-    TextFormField(controller: details, minLines: 5, maxLines: 8, decoration: InputDecoration(labelText: t(widget.am, 'What happened? Include place and time.', 'ምን ተፈጠረ? ቦታና ሰዓት ይጨምሩ።'), alignLabelWithHint: true), validator: (v) => v == null || v.trim().length < 10 ? t(widget.am, 'Add more detail', 'ተጨማሪ ዝርዝር ያስገቡ') : null),
-    SwitchListTile(contentPadding: EdgeInsets.zero, value: anonymous, onChanged: (v) => setState(() => anonymous = v), title: Text(t(widget.am, 'Send anonymously', 'ስም ሳይጠቅሱ ይላኩ'))),
-    if (!anonymous) TextField(controller: contact, decoration: InputDecoration(labelText: t(widget.am, 'Contact (optional)', 'መገኛ (አማራጭ)'))),
+    TextFormField(controller: details, minLines: 5, maxLines: 8, decoration: InputDecoration(labelText: tr(widget.am, 'What happened? Include place and time.', 'ምን ተፈጠረ? ቦታና ሰዓት ይጨምሩ።'), alignLabelWithHint: true), validator: (v) => v == null || v.trim().length < 10 ? tr(widget.am, 'Add more detail', 'ተጨማሪ ዝርዝር ያስገቡ') : null),
+    SwitchListTile(contentPadding: EdgeInsets.zero, value: anonymous, onChanged: (v) => setState(() => anonymous = v), title: Text(tr(widget.am, 'Send anonymously', 'ስም ሳይጠቅሱ ይላኩ'))),
+    if (!anonymous) TextField(controller: contact, decoration: InputDecoration(labelText: tr(widget.am, 'Contact (optional)', 'መገኛ (አማራጭ)'))),
     const SizedBox(height: 12),
-    OutlinedButton.icon(onPressed: pick, icon: const Icon(Icons.attach_file), label: Text(media == null ? t(widget.am, 'Attach photo or video', 'ፎቶ ወይም ቪዲዮ ያያይዙ') : media!.name)),
+    OutlinedButton.icon(onPressed: pick, icon: const Icon(Icons.attach_file), label: Text(media == null ? tr(widget.am, 'Attach photo or video', 'ፎቶ ወይም ቪዲዮ ያያይዙ') : media!.name)),
     const SizedBox(height: 18),
-    FilledButton(onPressed: sending ? null : submit, style: FilledButton.styleFrom(backgroundColor: red, padding: const EdgeInsets.all(16)), child: sending ? const CircularProgressIndicator(color: Colors.white) : Text(t(widget.am, 'Send to newsroom', 'ለዜና ክፍሉ ይላኩ'))),
+    FilledButton(onPressed: sending ? null : submit, style: FilledButton.styleFrom(backgroundColor: red, padding: const EdgeInsets.all(16)), child: sending ? const CircularProgressIndicator(color: Colors.white) : Text(tr(widget.am, 'Send to newsroom', 'ለዜና ክፍሉ ይላኩ'))),
     const SizedBox(height: 12),
-    Text(t(widget.am, 'Do not send material that could put you or another person at risk. Information must be verified before publication.', 'ሰውን አደጋ ላይ የሚጥል መረጃ አይላኩ። ከመታተሙ በፊት መረጃው መረጋገጥ አለበት።'), style: const TextStyle(color: grey, fontSize: 11)),
+    Text(tr(widget.am, 'Do not send material that could put you or another person at risk. Information must be verified before publication.', 'ሰውን አደጋ ላይ የሚጥል መረጃ አይላኩ። ከመታተሙ በፊት መረጃው መረጋገጥ አለበት።'), style: const TextStyle(color: grey, fontSize: 11)),
   ]));
 }
 
@@ -268,13 +268,13 @@ class _MessagePageState extends State<MessagePage> {
   void dispose() { name.dispose(); contact.dispose(); message.dispose(); super.dispose(); }
   Future<void> send() async {
     final am = widget.am;
-    if (message.text.trim().length < 3) { notice(t(am, 'Write a message first.', 'መጀመሪያ መልዕክት ይጻፉ።')); return; }
-    if (!connected) { notice(t(am, 'Publisher messaging is not connected yet.', 'የአሳታሚው መልዕክት አገልግሎት ገና አልተገናኘም።')); return; }
+    if (message.text.trim().length < 3) { notice(tr(am, 'Write a message first.', 'መጀመሪያ መልዕክት ይጻፉ።')); return; }
+    if (!connected) { notice(tr(am, 'Publisher messaging is not connected yet.', 'የአሳታሚው መልዕክት አገልግሎት ገና አልተገናኘም።')); return; }
     setState(() => sending = true);
     try {
       await Supabase.instance.client.from('publisher_messages').insert({'sender_name': name.text.trim(), 'contact': contact.text.trim(), 'message': message.text.trim()});
-      message.clear(); notice(t(am, 'Message sent to the publisher.', 'መልዕክቱ ተልኳል።'));
-    } catch (_) { notice(t(am, 'Could not send. Please try again later.', 'መላክ አልተቻለም።')); }
+      message.clear(); notice(tr(am, 'Message sent to the publisher.', 'መልዕክቱ ተልኳል።'));
+    } catch (_) { notice(tr(am, 'Could not send. Please try again later.', 'መላክ አልተቻለም።')); }
     finally { if (mounted) setState(() => sending = false); }
   }
   void notice(String s) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s))); }
@@ -282,15 +282,15 @@ class _MessagePageState extends State<MessagePage> {
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(20), children: [
     heading(widget.am, Icons.mail_outline, 'Contact the publisher', 'አሳታሚውን ያነጋግሩ'),
     const SizedBox(height: 8),
-    Text(t(widget.am, 'Send a private message to the Warka newsroom.', 'ለዋርካ ዜና ክፍል የግል መልዕክት ይላኩ።'), style: const TextStyle(color: grey)),
+    Text(tr(widget.am, 'Send a private message to the Warka newsroom.', 'ለዋርካ ዜና ክፍል የግል መልዕክት ይላኩ።'), style: const TextStyle(color: grey)),
     const SizedBox(height: 20),
-    TextField(controller: name, decoration: InputDecoration(labelText: t(widget.am, 'Name (optional)', 'ስም (አማራጭ)'))),
+    TextField(controller: name, decoration: InputDecoration(labelText: tr(widget.am, 'Name (optional)', 'ስም (አማራጭ)'))),
     const SizedBox(height: 12),
-    TextField(controller: contact, decoration: InputDecoration(labelText: t(widget.am, 'Phone or email (optional)', 'ስልክ ወይም ኢሜይል'))),
+    TextField(controller: contact, decoration: InputDecoration(labelText: tr(widget.am, 'Phone or email (optional)', 'ስልክ ወይም ኢሜይል'))),
     const SizedBox(height: 12),
-    TextField(controller: message, minLines: 5, maxLines: 8, decoration: InputDecoration(labelText: t(widget.am, 'Your message', 'መልዕክትዎ'))),
+    TextField(controller: message, minLines: 5, maxLines: 8, decoration: InputDecoration(labelText: tr(widget.am, 'Your message', 'መልዕክትዎ'))),
     const SizedBox(height: 18),
-    FilledButton(onPressed: sending ? null : send, style: FilledButton.styleFrom(backgroundColor: red, padding: const EdgeInsets.all(16)), child: Text(t(widget.am, 'Send message', 'መልዕክት ይላኩ'))),
+    FilledButton(onPressed: sending ? null : send, style: FilledButton.styleFrom(backgroundColor: red, padding: const EdgeInsets.all(16)), child: Text(tr(widget.am, 'Send message', 'መልዕክት ይላኩ'))),
   ]);
 }
 
