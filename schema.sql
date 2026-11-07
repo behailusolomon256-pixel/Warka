@@ -51,3 +51,33 @@ create policy "read published articles" on public.articles for select to anon, a
 -- Do not add public SELECT policies to tips/messages.
 -- Create staff accounts and staff-only policies before building the publisher dashboard.
 -- Create a private storage bucket named news-tips. Do not make it public.
+
+-- Anonymous product analytics. The mobile app may INSERT events, but it cannot
+-- read analytics or private newsroom submissions. Read metrics through a
+-- trusted server-side endpoint after staff authentication is implemented.
+create table if not exists public.analytics_events (
+  id bigint generated always as identity primary key,
+  event_type text not null check (event_type in ('view','share','like','comment')),
+  article_id uuid references public.articles(id) on delete set null,
+  language text not null default 'en' check (language in ('en','am')),
+  visitor_id uuid not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists analytics_events_created_at_idx
+  on public.analytics_events (created_at desc);
+create index if not exists analytics_events_article_idx
+  on public.analytics_events (article_id, created_at desc);
+create index if not exists analytics_events_type_language_idx
+  on public.analytics_events (event_type, language, created_at desc);
+
+alter table public.analytics_events enable row level security;
+
+-- Allow event submission only. No public SELECT policy is created.
+drop policy if exists "public submit analytics events" on public.analytics_events;
+create policy "public submit analytics events"
+  on public.analytics_events for insert to anon, authenticated
+  with check (true);
+
+-- Analytics queries must run on a trusted server after staff authentication.
+-- Never put a Supabase service-role key in the Flutter app.
