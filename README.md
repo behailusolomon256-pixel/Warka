@@ -18,17 +18,18 @@ Run locally with Flutter installed:
 2. Run `flutter create --platforms=android --project-name=warka_news .` if the Android folder is missing.
 3. Run `flutter run`.
 
-## Optional Supabase setup
+## Supabase backend and analytics setup
 1. Create a Supabase project.
 2. Run the SQL in `schema.sql` in the Supabase SQL Editor.
 3. Create a private Storage bucket named `news-tips` and configure upload policies.
-4. Pass only the Supabase anon/public key to the app using:
-   `--dart-define=SUPABASE_URL=YOUR_URL --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY`
+4. Pass only the Supabase public/publishable key to the app using the variable names supported by `lib/main.dart`.
+5. The SQL also creates `analytics_events` for view, share, like, and comment events. It permits public event inserts only. It does not expose analytics reads or private tips/messages to public users.
+6. Build a trusted, authenticated server endpoint for analytics queries before displaying live dashboard metrics. Do not place a service-role key in the Android app.
 
 Never place a Supabase service-role key in a mobile app.
 
 ## Build an Android APK
-Every push to `main` starts the Android build workflow. You can also run it manually from the Actions tab. Download the `warka-news-release-apk` artifact from a successful run.
+Every push to `main` starts `.github/workflows/android.yml`. The workflow installs dependencies, runs `flutter analyze`, builds a release APK, and uploads `warka-news-release-apk`.
 
 ## Production work still required
 The feed currently uses sample content. A Supabase articles feed, publisher authentication and dashboard, persistent bookmarks, moderation, secure media validation, privacy policy, and push notifications must be completed before public launch. Public users must never be allowed to read private tips or publisher messages.
