@@ -35,6 +35,33 @@ jobs:
       - name: Generate Android platform project
         run: flutter create --platforms=android --project-name warka_news .
 
+      - name: Set Android compile SDK
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          candidates = [
+              Path("android/app/build.gradle.kts"),
+              Path("android/app/build.gradle"),
+          ]
+          for path in candidates:
+              if not path.exists():
+                  continue
+              content = path.read_text()
+              pattern = re.compile(
+                  r"(?m)^(\\s*compileSdk(?:Version)?\\s*(?:=\\s*)?)"
+                  r"(?:flutter\\.compileSdkVersion|[0-9]+)(\\s*(?://.*)?$)"
+              )
+              updated, count = pattern.subn(r"\\g<1>36\\g<2>", content)
+              if count:
+                  path.write_text(updated)
+                  print(f"Set {path} compile SDK to 36")
+                  break
+          else:
+              raise SystemExit("Could not find an Android app compileSdk setting.")
+          PY
+
       - name: Install dependencies
         run: flutter pub get
 
